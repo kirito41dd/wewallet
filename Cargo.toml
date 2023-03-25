@@ -1,10 +1,12 @@
 [package]
-name = "eframe_template"
+name = "wewallet"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
+authors = ["kirito <me@kirito.info>"]
 edition = "2021"
 rust-version = "1.65"
 
+[workspace]
+members = ["."]
 
 [dependencies]
 egui = "0.21.0"
