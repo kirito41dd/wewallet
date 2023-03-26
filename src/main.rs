@@ -1,11 +1,18 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
-
+use tracing::info;
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result<()> {
     // Log to stdout (if you run with `RUST_LOG=debug`).
+
     tracing_subscriber::fmt::init();
+    std::thread::spawn(|| {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .build()
+            .unwrap();
+        rt.block_on(async { info!("tokio") });
+    });
 
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
@@ -34,5 +41,11 @@ fn main() {
         )
         .await
         .expect("failed to start eframe");
+    });
+    wasm_bindgen_futures::spawn_local(async {
+        let mut a = tokio::sync::Mutex::new(123);
+
+        let mut b = a.lock().await;
+        *b = 100;
     });
 }

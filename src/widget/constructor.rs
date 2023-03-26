@@ -1,3 +1,5 @@
+use crate::Ui;
+
 #[derive(Default, serde::Deserialize, serde::Serialize)]
 pub struct TxConstructor {}
 
@@ -17,8 +19,8 @@ impl crate::View for TxConstructor {
     }
 }
 
-impl TxConstructor {
+impl crate::Ui for TxConstructor {
     fn ui(&mut self, ui: &mut egui::Ui) {
-        ui.button("text");
+        ui.label("text");
     }
 }
