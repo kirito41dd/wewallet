@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::widget;
+use crate::{widget, Ui};
 
 #[derive(Default, serde::Deserialize, serde::Serialize)]
 pub struct State {
@@ -9,6 +9,7 @@ pub struct State {
     open: std::collections::BTreeSet<String>,
     backend_panel: super::backend_panel::BackendPanel,
     manul_open: bool,
+    backend_panel_open: bool,
 }
 
 pub struct WalletApp {
@@ -27,6 +28,7 @@ impl WalletApp {
         };
         let tx_constructor = Box::new(widget::TxConstructor::default());
         slf.state.views.push(tx_constructor);
+        slf.state.views.push(Box::new(widget::TxDecoder::default()));
         slf.state.manul_open = true;
         Self::set_open(&mut slf.state.open, slf.state.views[0].name(), true);
 
@@ -87,7 +89,7 @@ impl WalletApp {
                 ui.separator();
 
                 // 控制台
-                ui.toggle_value(&mut self.state.backend_panel.open, "💻 控制台");
+                ui.toggle_value(&mut self.state.backend_panel_open, "💻 控制台");
                 ui.separator();
                 // 菜单
                 ui.toggle_value(&mut self.state.manul_open, "菜单");
@@ -96,8 +98,8 @@ impl WalletApp {
     }
 
     // 控制台侧栏
-    fn backend_panel(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        let is_open = self.state.backend_panel.open;
+    fn backend_panel(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let is_open = self.state.backend_panel_open;
 
         egui::SidePanel::left("backend_panel")
             .resizable(false)
@@ -106,7 +108,7 @@ impl WalletApp {
                     ui.heading("💻 控制台");
                 });
                 ui.separator();
-                self.state.backend_panel.ui(ui, frame);
+                self.state.backend_panel.ui(ui);
             });
     }
 
@@ -126,7 +128,7 @@ impl WalletApp {
                     format!("{} GitHub", GITHUB),
                     "https://github.com/kirito41dd/wewallet",
                 );
-                ui.hyperlink_to(format!("Telegram"), "https://t.me/talk_btc");
+                ui.hyperlink_to("Telegram", "https://t.me/talk_btc");
 
                 ui.separator();
                 egui::ScrollArea::vertical().show(ui, |ui| {
